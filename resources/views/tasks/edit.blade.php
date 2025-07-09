@@ -1,19 +1,13 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Tugas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="p-6 bg-gray-100">
+@extends('layouts.app')
 
-    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-2xl font-bold mb-4">Edit Task</h2>
+@section('content')
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md mt-10 border border-gray-100">
+        <h2 class="text-3xl font-extrabold mb-6 text-gray-800 text-center">✏️ Edit Task</h2>
 
         @if ($errors->any())
-            <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
-                <strong>Error:</strong>
-                <ul class="ml-4 list-disc">
+            <div class="bg-red-50 text-red-700 border border-red-200 p-4 rounded mb-6">
+                <strong class="block font-semibold mb-2">Terjadi Kesalahan:</strong>
+                <ul class="list-disc list-inside text-sm text-red-600">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -21,30 +15,43 @@
             </div>
         @endif
 
-        <form action="{{ route('tasks.update', $task) }}" method="POST" class="space-y-4">
+        <form method="POST" action="{{ route('tasks.update', $task) }}" class="space-y-6">
             @csrf
             @method('PUT')
 
-            <input type="text" name="name" value="{{ $task->name }}" required
-                class="w-full px-4 py-2 border border-gray-300 rounded-md">
+            {{-- Task Name --}}
+            <div>
+                <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">📝 Nama Tugas</label>
+                <input type="text" name="name" id="name" value="{{ old('name', $task->name) }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Masukkan nama tugas...">
+            </div>
 
-            <input type="date" name="deadline"
-                value="{{ $task->deadline ? \Carbon\Carbon::parse($task->deadline)->format('Y-m-d') : '' }}"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md">
+            {{-- Deadline --}}
+            <div>
+                <label for="deadline" class="block text-sm font-semibold text-gray-700 mb-1">📅 Deadline</label>
+                <input type="date" name="deadline" id="deadline" value="{{ old('deadline', $task->deadline) }}"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
 
-            <select name="priority" class="w-full px-4 py-2 border border-gray-300 rounded-md">
-                <option value="low" {{ $task->priority == 'low' ? 'selected' : '' }}>📘 Rendah</option>
-                <option value="normal" {{ $task->priority == 'normal' ? 'selected' : '' }}>📙 Normal</option>
-                <option value="high" {{ $task->priority == 'high' ? 'selected' : '' }}>📕 Tinggi</option>
-            </select>
+            {{-- Priority --}}
+            <div>
+                <label for="priority" class="block text-sm font-semibold text-gray-700 mb-1">⚠️ Prioritas</label>
+                <select name="priority" id="priority"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="low" {{ $task->priority == 'low' ? 'selected' : '' }}>🟢 Rendah</option>
+                    <option value="normal" {{ $task->priority == 'normal' ? 'selected' : '' }}>🟠 Normal</option>
+                    <option value="high" {{ $task->priority == 'high' ? 'selected' : '' }}>🔴 Tinggi</option>
+                </select>
+            </div>
 
-            <div class="flex justify-between items-center">
-                <a href="{{ route('tasks.index') }}" class="text-blue-600 hover:underline">← Kembali</a>
+            {{-- Submit --}}
+            <div class="flex justify-end">
                 <button type="submit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    💾 Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>
-
-</body>
-</html>
+@endsection

@@ -7,43 +7,47 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Task::query();
+ public function index(Request $request)
+{
+    $query = Task::query();
 
-        if ($request->filled('filter')) {
-            if ($request->filter === 'done') {
-                $query->where('is_done', true);
-            } elseif ($request->filter === 'undone') {
-                $query->where('is_done', false);
-            }
-        }
-
-        if ($request->filled('priority')) {
-            $query->where('priority', $request->priority);
-        }
-
-        $tasks = $query->orderBy('created_at', 'desc')->get();
-
-        return view('tasks.index', compact('tasks'));
+    if ($request->filter === 'done') {
+        $query->where('is_done', true);
+    } elseif ($request->filter === 'undone') {
+        $query->where('is_done', false);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'deadline' => 'nullable|date',
-            'priority' => 'required|in:low,normal,high', 
-        ]);
-
-        Task::create([
-            'name' => $request->name,
-            'deadline' => $request->deadline,
-            'priority' => $request->priority, 
-        ]);
-
-        return redirect('/');
+    if ($request->has('priority')) {
+        $query->where('priority', $request->priority);
     }
+
+    $tasks = $query
+        ->orderBy('is_done') 
+        ->orderByRaw("FIELD(priority, 'high', 'normal', 'low')") 
+        ->orderBy('deadline') 
+        ->get();
+
+    return view('tasks.index', compact('tasks'));
+}
+
+   public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'deadline' => 'nullable|date',
+        'priority' => 'required|in:low,normal,high', 
+    ]);
+
+    Task::create([
+        'name' => $request->name,
+        'deadline' => $request->deadline,
+        'priority' => $request->priority,
+        'user_id' => 1, // ← tambah ini biar gak error
+    ]);
+
+    return redirect('/');
+}
+
 
     public function update(Request $request, Task $task)
     {
