@@ -7,28 +7,34 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
- public function index(Request $request)
+public function index(Request $request)
 {
     $query = Task::query();
 
-    if ($request->filter === 'done') {
-        $query->where('is_done', true);
-    } elseif ($request->filter === 'undone') {
-        $query->where('is_done', false);
+    if ($request->has('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->has('filter')) {
+        if ($request->filter === 'done') {
+            $query->where('is_done', true);
+        } elseif ($request->filter === 'undone') {
+            $query->where('is_done', false);
+        }
     }
 
     if ($request->has('priority')) {
         $query->where('priority', $request->priority);
     }
 
-    $tasks = $query
-        ->orderBy('is_done') 
-        ->orderByRaw("FIELD(priority, 'high', 'normal', 'low')") 
-        ->orderBy('deadline') 
-        ->get();
+    $tasks = $query->orderBy('is_done', 'asc')
+                   ->orderBy('deadline', 'asc')
+                   ->orderBy('created_at', 'desc')
+                   ->get();
 
     return view('tasks.index', compact('tasks'));
 }
+
 
    public function store(Request $request)
 {
@@ -42,7 +48,7 @@ class TaskController extends Controller
         'name' => $request->name,
         'deadline' => $request->deadline,
         'priority' => $request->priority,
-        'user_id' => 1, // ← tambah ini biar gak error
+        'user_id' => 1,
     ]);
 
     return redirect('/');

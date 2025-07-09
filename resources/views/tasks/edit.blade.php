@@ -19,7 +19,7 @@
             @csrf
             @method('PUT')
 
-            {{-- Task Name --}}
+           
             <div>
                 <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">📝 Nama Tugas</label>
                 <input type="text" name="name" id="name" value="{{ old('name', $task->name) }}"
@@ -27,14 +27,14 @@
                     placeholder="Masukkan nama tugas...">
             </div>
 
-            {{-- Deadline --}}
+     
             <div>
                 <label for="deadline" class="block text-sm font-semibold text-gray-700 mb-1">📅 Deadline</label>
                 <input type="date" name="deadline" id="deadline" value="{{ old('deadline', $task->deadline) }}"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
 
-            {{-- Priority --}}
+            
             <div>
                 <label for="priority" class="block text-sm font-semibold text-gray-700 mb-1">⚠️ Prioritas</label>
                 <select name="priority" id="priority"
@@ -45,7 +45,6 @@
                 </select>
             </div>
 
-            {{-- Submit --}}
             <div class="flex justify-end">
                 <button type="submit"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-400">
