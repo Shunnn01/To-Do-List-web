@@ -1,24 +1,18 @@
 console.log("✅ JavaScript is active");
 
-document.addEventListener('DOMContentLoaded', function () {
-    const html = document.documentElement;
+document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('toggleDark');
-    const icon = document.getElementById('darkIcon');
+    const html = document.documentElement;
 
-    // Set default theme from localStorage
-    const theme = localStorage.getItem('theme');
-    if (theme === 'dark') {
+    // Set awal dari localStorage
+    if (localStorage.getItem('theme') === 'dark') {
         html.classList.add('dark');
-        icon.textContent = '☀️';
     } else {
         html.classList.remove('dark');
-        icon.textContent = '🌙';
     }
 
-    toggleBtn.addEventListener('click', function () {
-        const isDark = html.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        icon.textContent = isDark ? '☀️' : '🌙';
-        console.log("🔄 Theme toggled:", isDark ? "dark" : "light");
+    toggleBtn?.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 });

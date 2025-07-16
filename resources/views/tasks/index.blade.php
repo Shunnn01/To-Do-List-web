@@ -10,7 +10,6 @@
     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari tugas..."
         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 dark:bg-gray-800 dark:text-white dark:border-gray-600">
 </form>
-
 <form action="{{ route('tasks.store') }}" method="POST"
     class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-4 md:space-y-0 md:flex md:items-end md:gap-4 mb-6">
     @csrf
@@ -38,7 +37,6 @@
             class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full mt-4 md:mt-0">+ Tambah</button>
     </div>
 </form>
-
 <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-3 mb-6">
     <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
         <span class="font-semibold">Status:</span>

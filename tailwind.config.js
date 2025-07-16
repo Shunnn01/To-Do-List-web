@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   darkMode: 'class',
   content: [
     './resources/**/*.blade.php',
@@ -7,12 +7,12 @@ export default {
     './resources/**/*.vue',
   ],
   safelist: [
-    'bg-gray-100',
     'bg-white',
+    'bg-gray-100',
+    'bg-gray-900',
     'text-gray-800',
     'text-black',
     'text-gray-100',
-    'bg-gray-900',
     'dark:bg-gray-900',
     'dark:text-gray-100',
   ],

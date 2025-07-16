@@ -86,7 +86,7 @@ public function index(Request $request)
         return redirect('/');
     }
 
-    public function edit(Task $task)
+    public function edit(Task $task) 
     {
         return view('tasks.edit', compact('task'));
     }
