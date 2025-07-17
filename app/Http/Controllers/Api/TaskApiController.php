@@ -5,65 +5,63 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskApiController extends Controller
 {
-public function index($id = null)
-{
-    try {
-        if ($id) {
-            $task = Task::find($id);
-            if (!$task) {
-                return response()->json([
-                    'message' => 'Task tidak ditemukan',
-                    'data' => null
-                ]);
-            }
+    public function index()
+    {
+        try {
+            $user = Auth::user();
+
+            $tasks = Task::where('user_id', $user->id)->latest()->get();
 
             return response()->json([
-                'message' => 'Task berhasil ditemukan',
-                'data' => $task
+                'message' => $tasks->isEmpty() ? 'Tidak ada data' : 'Data berhasil diambil',
+                'data' => $tasks
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $tasks = Task::latest()->get();
-
-        return response()->json([
-            'message' => $tasks->isEmpty() ? 'Tidak ada data' : 'Data berhasil diambil',
-            'data' => $tasks
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Terjadi kesalahan',
-        ]);
     }
+
+   public function store(Request $request)
+{
+    $user = auth()->user();
+
+    // Validasi input
+    $validated = $request->validate([
+        'name' => 'required|string',
+        'deadline' => 'nullable|date',
+        'priority' => 'nullable|in:low,normal,high',
+    ]);
+
+    // Simpan task
+    $task = Task::create([
+        'name' => $validated['name'],
+        'deadline' => $validated['deadline'] ?? null,
+        'priority' => $validated['priority'] ?? 'normal',
+        'user_id' => $user->id,
+        'is_done' => false
+    ]);
+
+    return response()->json([
+        'message' => 'Task berhasil dibuat oleh ' . $user->name,
+        'data' => $task
+    ], 201);
 }
-
-
-    public function store(Request $request)
-    {
-        $task = Task::create([
-            'name' => $request->name ?? 'Tanpa Nama',
-            'deadline' => $request->deadline,
-            'priority' => $request->priority ?? 'normal',
-            'user_id' => 1,
-            'is_done' => false
-        ]);
-
-        return response()->json([
-            'message' => 'Task berhasil dibuat',
-            'data' => $task
-        ], 201);
-    }
 
     public function update(Request $request, $id)
     {
-        $task = Task::find($id);
+        $user = Auth::user();
+        $task = Task::where('id', $id)->where('user_id', $user->id)->first();
 
         if (!$task) {
             return response()->json([
-                'message' => 'Task tidak ditemukan'
+                'message' => 'Task tidak ditemukan atau bukan milik Anda'
             ], 404);
         }
 
@@ -81,16 +79,17 @@ public function index($id = null)
         return response()->json([
             'message' => 'Task berhasil diupdate',
             'data' => $task
-        ], 200);
+        ]);
     }
 
     public function destroy($id)
     {
-        $task = Task::find($id);
+        $user = Auth::user();
+        $task = Task::where('id', $id)->where('user_id', $user->id)->first();
 
         if (!$task) {
             return response()->json([
-                'message' => 'Task tidak ditemukan'
+                'message' => 'Task tidak ditemukan atau bukan milik Anda'
             ], 404);
         }
 
@@ -98,6 +97,24 @@ public function index($id = null)
 
         return response()->json([
             'message' => 'Task berhasil dihapus'
-        ], 200);
+        ]);
+    }
+
+    public function show($id)
+    {
+        $user = Auth::user();
+        $task = Task::where('id', $id)->where('user_id', $user->id)->first();
+
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task tidak ditemukan atau bukan milik Anda',
+                'data' => null
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Task berhasil ditemukan',
+            'data' => $task
+        ]);
     }
 }

@@ -4,12 +4,11 @@
 
 @section('content')
 
-
-
 <form method="GET" action="{{ route('tasks.index') }}" class="mb-6">
     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari tugas..."
         class="w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300 dark:bg-gray-800 dark:text-white dark:border-gray-600">
 </form>
+
 <form action="{{ route('tasks.store') }}" method="POST"
     class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-4 md:space-y-0 md:flex md:items-end md:gap-4 mb-6">
     @csrf
@@ -37,6 +36,7 @@
             class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full mt-4 md:mt-0">+ Tambah</button>
     </div>
 </form>
+
 <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-3 mb-6">
     <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
         <span class="font-semibold">Status:</span>
@@ -65,13 +65,16 @@
                     @csrf
                     <input type="checkbox" onchange="this.form.submit()" {{ $task->is_done ? 'checked' : '' }}>
                 </form>
+
                 <div class="{{ $task->is_done ? 'line-through text-gray-400' : 'text-gray-800 dark:text-white' }}">
                     <div class="font-semibold text-lg">{{ $task->name }}</div>
+
                     <div class="text-sm">
                         <span class="font-medium">🗓️ Deadline:</span>
                         {{ \Carbon\Carbon::parse($task->deadline)->format('d M Y') }}
                         <span class="text-gray-500">({{ \Carbon\Carbon::parse($task->deadline)->diffForHumans() }})</span>
                         <br>
+
                         <span class="font-medium">🔥 Prioritas:</span>
                         <span
                             class="inline-block px-2 py-1 text-xs font-bold rounded-full
@@ -80,9 +83,16 @@
                                'bg-green-100 text-green-800 dark:bg-green-700 dark:text-white') }}">
                             {{ ucfirst($task->priority) }}
                         </span>
+
+                        {{-- 🔽 Tambahan informasi ID --}}
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            🆔 Task ID: {{ $task->id }} |
+                            👤 User ID: {{ $task->user_id }}
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="flex gap-2 text-lg">
                 <a href="{{ route('tasks.edit', $task->id) }}"
                     class="text-orange-500 hover:text-orange-700">✏️</a>
@@ -94,7 +104,10 @@
             </div>
         </li>
     @empty
-        <li class="text-center text-gray-400 py-6 bg-white dark:bg-gray-800 rounded-xl shadow-inner">Tidak ada tugas ditemukan.</li>
+        <li class="text-center text-gray-400 py-6 bg-white dark:bg-gray-800 rounded-xl shadow-inner">
+            Tidak ada tugas ditemukan.
+        </li>
     @endforelse
 </ul>
+
 @endsection
