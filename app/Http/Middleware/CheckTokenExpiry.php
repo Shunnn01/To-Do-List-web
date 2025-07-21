@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Auth;
 
 class CheckTokenExpiry
 {
@@ -13,17 +14,26 @@ class CheckTokenExpiry
         $tokenString = $request->bearerToken();
 
         if (!$tokenString) {
-            return response()->json(['message' => 'No token provided'], 401);
+            return response()->json(['message' => 'Token tidak ditemukan'], 401);
         }
 
         $token = PersonalAccessToken::where('token', hash('sha256', $tokenString))->first();
 
         if (!$token) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            return response()->json(['message' => 'Token tidak valid'], 401);
         }
 
         if ($token->expires_at !== null && now()->greaterThan($token->expires_at)) {
-            return response()->json(['message' => 'Token expired'], 401);
+            $token->delete();
+            return response()->json(['message' => 'Token telah kedaluwarsa'], 401);
+        }
+
+        if (!$request->user()) {
+            $user = $token->tokenable;
+
+            if ($user) {
+                Auth::setUser($user);
+            }
         }
 
         return $next($request);

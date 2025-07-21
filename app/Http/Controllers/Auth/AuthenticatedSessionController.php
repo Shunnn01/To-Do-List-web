@@ -5,12 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Login dan buat token dengan expired time.
-     */
     public function store(Request $request)
     {
         $credentials = $request->validate([
@@ -19,33 +17,34 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid login credentials'], 401);
+            return response()->json(['message' => 'Email atau password salah'], 401);
         }
 
         $user = Auth::user();
 
-        // Buat token
-        $tokenResult = $user->createToken('api_token');
-        
-        // Set expired dalam 1 jam
-        $tokenResult->accessToken->expires_at = now()->addHour(); 
-        $tokenResult->accessToken->save();
+        $plainTextToken = Str::random(80);
 
-        return response()
-            ->json([
-                'user' => $user,
-                'message' => 'Login berhasil',
-                'token_type' => 'Bearer',
-                'access_token' => $tokenResult->plainTextToken,
-                'expires_at' => $tokenResult->accessToken->expires_at->toDateTimeString()
-            ])
-            ->header('Authorization', 'Bearer ' . $tokenResult->plainTextToken);
+        $token = $user->tokens()->create([
+            'name' => 'api_token',
+            'token' => hash('sha256', $plainTextToken),
+            'abilities' => ['*'],
+            'expires_at' => now()->addDays(7), // Token aktif selama 7 hari
+        ]);
+
+        return response()->json([
+            'message' => 'Login berhasil',
+            'user' => $user,
+            'token_type' => 'Bearer',
+            // 'expires_at' => tidak ditampilkan di sini
+        ])
+        ->header('Authorization', 'Bearer ' . $plainTextToken)
+        ->header('X-Expires-At', $token->expires_at->toISOString());
     }
- 
+
     public function destroy(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->user()?->currentAccessToken()?->delete();
 
-        return response()->json(['message' => 'Logged out']);
+        return response()->json(['message' => 'Berhasil logout']);
     }
 }

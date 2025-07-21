@@ -11,7 +11,7 @@ Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 
-Route::middleware(['auth:sanctum', 'check.token.expiry'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
     Route::post('/tasks', [TaskApiController::class, 'store']);
     Route::put('/tasks/{id}', [TaskApiController::class, 'update']);
