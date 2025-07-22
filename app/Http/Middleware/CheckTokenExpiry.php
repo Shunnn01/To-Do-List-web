@@ -24,13 +24,12 @@ class CheckTokenExpiry
         }
 
         if ($token->expires_at !== null && now()->greaterThan($token->expires_at)) {
-            $token->delete();
-            return response()->json(['message' => 'Token telah kedaluwarsa'], 401);
+            $token->delete(); 
+            return response()->json(['message' => 'Token expired'], 401); 
         }
 
         if (!$request->user()) {
             $user = $token->tokenable;
-
             if ($user) {
                 Auth::setUser($user);
             }

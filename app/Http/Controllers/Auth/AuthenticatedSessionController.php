@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthenticatedSessionController extends Controller
 {
     public function store(Request $request)
     {
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -28,22 +30,22 @@ class AuthenticatedSessionController extends Controller
             'name' => 'api_token',
             'token' => hash('sha256', $plainTextToken),
             'abilities' => ['*'],
-            'expires_at' => now()->addDays(7), // Token aktif selama 7 hari
+            'expires_at' => now()->addSeconds(60), 
         ]);
+
 
         return response()->json([
             'message' => 'Login berhasil',
             'user' => $user,
+            'access_token' => $plainTextToken,
             'token_type' => 'Bearer',
-            // 'expires_at' => tidak ditampilkan di sini
-        ])
-        ->header('Authorization', 'Bearer ' . $plainTextToken)
-        ->header('X-Expires-At', $token->expires_at->toISOString());
+            'expires_at' => $token->expires_at->toDateTimeString(),
+        ])->header('Authorization', 'Bearer ' . $plainTextToken);
     }
 
     public function destroy(Request $request)
     {
-        $request->user()?->currentAccessToken()?->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Berhasil logout']);
     }

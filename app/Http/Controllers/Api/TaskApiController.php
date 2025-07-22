@@ -32,14 +32,12 @@ class TaskApiController extends Controller
 {
     $user = auth()->user();
 
-    // Validasi input
     $validated = $request->validate([
         'name' => 'required|string',
         'deadline' => 'nullable|date',
         'priority' => 'nullable|in:low,normal,high',
     ]);
-
-    // Simpan task
+    
     $task = Task::create([
         'name' => $validated['name'],
         'deadline' => $validated['deadline'] ?? null,
